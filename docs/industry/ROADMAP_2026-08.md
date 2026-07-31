@@ -36,5 +36,6 @@ cd ../katala-trust && npm run verify:local
 ## Status
 
 - 2026-08-01: Rank 1–5 landed (`thinkTrustBridge.mjs`, host-hook smoke, OSS CI, narrower export, `evals/trust-claims-v1.jsonl`).
+- 2026-08-01: OpenClaw tool adapter (`openClawToolAdapter.mjs` + smoke) maps host tool args → `katala:think`.
 - Overnight loop until 09:00 JST continues verify/harden/research notes.
-- Next after sleep: real OpenClaw host wiring beyond smoke.
+- Next after sleep: register adapter against a real OpenClaw/ZeroClaw runtime (not smoke-only).
