@@ -1,7 +1,7 @@
 {
   "source_repo": "Nicolas0315/Katala (private monorepo)",
   "public_package": "katala-trust",
-  "file_count": 96,
+  "file_count": 97,
   "personal_marker_hits": 0,
   "includes": [
     "LICENSE",
@@ -24,5 +24,5 @@
     "scripts/run-trust-eval.mjs",
     "skills/katala-think/SKILL.md"
   ],
-  "exported_at": "2026-07-31T16:29:16Z"
+  "exported_at": "2026-07-31T16:31:17Z"
 }
