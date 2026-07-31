@@ -1,0 +1,179 @@
+# Katala マルチモーダル思考エンジン .gitignore
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Next.js build artifacts (keeping minimal for future web interface)
+.next/
+.vercel
+out/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+# Anchor to repo root: bare lib/ would also ignore src/lib (29 app-source files,
+# incl. the WebAuthn implementation), silently dropping them from commits.
+/lib/
+/lib64/
+parts/
+sdist/
+var/
+wheels/
+.venv/
+venv/
+ENV/
+env/
+.env
+.env.local
+*.env
+*.env.local
+.pytest_cache/
+.hypothesis/
+*.egg-info/
+
+# Rust
+target/
+Cargo.lock
+*.whl
+rust_accel/target/
+rust_accel/*.whl
+ks40b-lite/target/
+
+# 思考エンジン実行結果
+output/
+runs/
+reports/
+spectrograms/
+/generated_images/
+
+# 3D Studio出力ファイル（大きなバイナリファイル）
+katala-studio/output/*.fbx
+katala-studio/output/*.obj
+katala-studio/output/*.unitypackage
+katala-studio/output/*.blend
+
+# 画像・動画ファイル（生成物）
+*.png
+*.jpg
+*.gif
+*.mp4
+*.wav
+*.mov
+
+# ただし、重要なドキュメント画像は保持
+!docs/**/*.png
+!papers/**/*.png
+!README_assets/*.png
+
+# ログ・一時ファイル
+*.log
+.katala_checkpoints/
+.katala_beliefs.json
+.katala_concept_library.json
+*.tmp
+
+# IDE・エディター
+.vscode/
+.idea/
+.cursor/
+.claude/
+
+# OS固有
+.DS_Store
+Thumbs.db
+
+# macOS metadata
+._*
+._.DS_Store
+._.git
+
+# テスト関連
+coverage/
+.nyc_output
+.vitest/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Claude Code専用ファイル（workspace artifacts）
+AGENTS.md
+BOOTSTRAP.md
+CLAUDE.md
+HEARTBEAT.md
+IDENTITY.md
+SOUL.md
+TODO_CODEX.md
+TOOLS.md
+USER.md
+MASTER_INDEX.md
+MEMORY.md
+PREDICTIONS.md
+loop.sh
+api_check.py
+tasks.json
+memory/
+workspace/
+katalalog_yugi/
+knowledge/
+
+# 開発時の実験ディレクトリ
+experiments/
+sandbox/
+
+# Stale submodules
+claude-code-best-practice-temp/
+dexter/
+projects/
+
+# 機械学習モデル・重いデータ
+*.model
+*.weights
+*.h5
+*.pkl
+*.joblib
+
+# マルチモーダル処理の一時ファイル
+temp_audio/
+temp_video/
+temp_render/
+
+# Private Visz workspaces
+/ViszAGI/
+/ViszBot_Beta/
+/ViszBotDebug/
+/ViszBot-Debug/
+
+# Private Zero-side runtime imports / secrets
+/Labyrinth_ZERO/_private/
+
+# Backup files
+*.bak
+*.bak.*
+
+# OpenClaw workspace (local agent runtime)
+.openclaw/
+
+# PID files
+*.pid
+
+# Build info cache
+*.tsbuildinfo
+
+# Cleanup scripts (machine-local)
+cleanup_windows.ps1
+
+# Data (generated)
+data/matsuri_logs/
