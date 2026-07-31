@@ -11,8 +11,8 @@ Private monorepo remains the R&D home; this cut is what outsiders can run and tr
 
 | # | Part | Code | Why now |
 | --- | --- | --- | --- |
-| 1 | Think contract CLI | `packages/katala/gateway/katala-think.mjs` + `katalaThinkContract.mjs` | Host-agnostic stdin/stdout verification |
-| 2 | Trust + consensus engines | `packages/katala/core/TrustScorer.ts`, `ConsensusEngine.ts` | Lab-neutral trust axes |
+| 1 | Think contract CLI | `packages/katala/gateway/katala-think.mjs` + `katalaThinkContract.mjs` + `thinkTrustBridge.mjs` | Host-agnostic stdin/stdout verification with trust axes |
+| 2 | Trust + consensus engines | `TrustScorer.ts`, `ConsensusEngine.ts` (+ local dual-profile bridge in think) | Lab-neutral trust axes |
 | 3 | Mediation + synergy | `MediationService.ts`, `LocalMediationManager.ts`, `SynergyEngine.ts` | A2A negotiation before reveal |
 | 4 | Gateway policy + HTTP bridge | `AgentGatewayPolicy.ts`, `KatalaClawGateway.ts`, `IntakeRouter.ts` | Peer auth + HITL objects |
 | 5 | Immutable ledger + board | `ImmutableLedger.ts`, `KatalaBulletinBoard.ts` | Audit trail for resolved mediation |

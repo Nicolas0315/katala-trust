@@ -1,5 +1,6 @@
 import { pathToFileURL } from "node:url";
 import { z } from "zod";
+import { evaluateContextTrust } from "./thinkTrustBridge.mjs";
 
 const visibilitySchema = z.enum(["IGNORE", "PRIVATE", "MEDIATION", "PUBLIC"]);
 const taskModeSchema = z.enum(["analyze", "mediate", "propose", "review"]);
@@ -7,6 +8,8 @@ const responseStatusSchema = z.enum(["ok", "rejected", "unsafe", "needs-human"])
 const actionKindSchema = z.enum(["reply", "plan", "patch-proposal", "policy-warning"]);
 const actionRiskSchema = z.enum(["low", "medium", "high"]);
 const memoryModeSchema = z.enum(["none", "ephemeral", "distilled-export"]);
+const gradeSchema = z.enum(["S", "A", "B", "C", "D", "F", "N/A"]);
+const consensusSchema = z.enum(["unanimous", "majority", "tiebreaker", "deadlock", "none"]);
 
 const safeRelativePathSchema = z
   .string()
@@ -43,6 +46,42 @@ const memoryExportSchema = z.object({
   visibility: z.enum(["MEDIATION", "PUBLIC"]),
   ttl_seconds: z.number().int().positive().max(31_536_000),
   confidence: z.number().min(0).max(1),
+});
+
+const trustAxesSchema = z.object({
+  freshness: z.number().min(0).max(1),
+  provenance: z.number().min(0).max(1),
+  verification: z.number().min(0).max(1),
+  accessibility: z.number().min(0).max(1),
+});
+
+const verificationSchema = z.object({
+  enabled: z.boolean(),
+  claim_count: z.number().int().min(0).max(128),
+  composite_score: z.number().min(0).max(1).nullable(),
+  grade: gradeSchema,
+  consensus: consensusSchema,
+  divergence: z.number().min(0).max(1),
+  axes: trustAxesSchema.nullable(),
+  caveats: z.array(z.string().min(1).max(200)).max(8),
+  dissent: z
+    .array(
+      z.object({
+        agent_id: z.string().min(1).max(120),
+        score: z.number().min(0).max(1),
+        reasoning: z.string().min(1).max(200),
+      }),
+    )
+    .max(4),
+  claim_summaries: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(120),
+        grade: z.enum(["S", "A", "B", "C", "D", "F"]),
+        composite_score: z.number().min(0).max(1),
+      }),
+    )
+    .max(32),
 });
 
 export const katalaThinkRequestSchema = z.object({
@@ -90,6 +129,7 @@ export const katalaThinkResponseSchema = z.object({
     requires_human_approval: z.boolean(),
     forbidden_action_attempted: z.boolean(),
   }),
+  verification: verificationSchema,
 });
 
 function normalizeGoal(goal) {
@@ -115,7 +155,22 @@ function summarizeContext(contextItems) {
   return counts;
 }
 
-function buildOkAction(request, counts) {
+function emptyVerification(caveat) {
+  return {
+    enabled: false,
+    claim_count: 0,
+    composite_score: null,
+    grade: "N/A",
+    consensus: "none",
+    divergence: 0,
+    axes: null,
+    caveats: [caveat],
+    dissent: [],
+    claim_summaries: [],
+  };
+}
+
+function buildOkAction(request, counts, verification) {
   const recommendedAction =
     request.task.mode === "review"
       ? "stateless-review"
@@ -130,8 +185,10 @@ function buildOkAction(request, counts) {
       public_context_count: counts.publicCount,
       mediation_context_count: counts.mediationCount,
       private_context_withheld: counts.privateCount > 0,
+      trust_grade: verification.grade,
+      trust_score: verification.composite_score,
     },
-    risk: "low",
+    risk: verification.requires_human_approval ? "medium" : "low",
   };
 }
 
@@ -142,6 +199,20 @@ function buildUnsafeAction(reasonCodes) {
     payload: {
       reason_codes: reasonCodes,
       recommended_action: "retry-with-stateless-read-only-contract",
+    },
+    risk: "high",
+  };
+}
+
+function buildNeedsHumanAction(verification) {
+  return {
+    kind: "plan",
+    target: "host",
+    payload: {
+      recommended_action: "human-review-before-side-effects",
+      trust_grade: verification.grade,
+      trust_score: verification.composite_score,
+      consensus: verification.consensus,
     },
     risk: "high",
   };
@@ -159,7 +230,7 @@ function buildRejectionAction(reasonCodes) {
   };
 }
 
-function buildReasoningSummary(request, counts, extraReason) {
+function buildReasoningSummary(request, counts, verification, extraReason) {
   const summary = [
     `mode:${request.task.mode}`,
     `public_context:${counts.publicCount}`,
@@ -167,6 +238,8 @@ function buildReasoningSummary(request, counts, extraReason) {
     `private_context_withheld:${counts.privateCount}`,
     `ignored_context:${counts.ignoredCount}`,
     `memory_mode:${request.memory_mode}`,
+    `trust_grade:${verification.grade}`,
+    `trust_consensus:${verification.consensus}`,
     "execution:read-only",
     "memory_exports:none",
   ];
@@ -175,7 +248,22 @@ function buildReasoningSummary(request, counts, extraReason) {
     summary.push(`status_reason:${extraReason}`);
   }
 
-  return summary;
+  return summary.slice(0, 16);
+}
+
+function toPublicVerification(evaluation) {
+  return {
+    enabled: evaluation.enabled,
+    claim_count: evaluation.claim_count,
+    composite_score: evaluation.composite_score,
+    grade: evaluation.grade,
+    consensus: evaluation.consensus,
+    divergence: evaluation.divergence,
+    axes: evaluation.axes,
+    caveats: evaluation.caveats,
+    dissent: evaluation.dissent,
+    claim_summaries: evaluation.claim_summaries,
+  };
 }
 
 export function createKatalaThinkResponse(request) {
@@ -188,26 +276,64 @@ export function createKatalaThinkResponse(request) {
   if (request.workspace.write_paths.length > 0) reasonCodes.push("write_paths_not_allowed");
   if (request.memory_mode !== "none") reasonCodes.push("memory_mode_not_supported_in_stateless_sidecar");
 
-  const response = {
+  const trustEvaluation = evaluateContextTrust(request.context_items);
+  const verification = toPublicVerification(trustEvaluation);
+
+  if (reasonCodes.length > 0) {
+    return katalaThinkResponseSchema.parse({
+      request_id: request.request_id,
+      status: "unsafe",
+      distilled_intent: normalizeGoal(request.task.goal),
+      reasoning_summary: buildReasoningSummary(
+        request,
+        counts,
+        verification,
+        reasonCodes.join(","),
+      ),
+      candidate_actions: [buildUnsafeAction(reasonCodes)],
+      memory_exports: [],
+      safety: {
+        requires_human_approval: true,
+        forbidden_action_attempted: true,
+      },
+      verification,
+    });
+  }
+
+  if (trustEvaluation.requires_human_approval) {
+    return katalaThinkResponseSchema.parse({
+      request_id: request.request_id,
+      status: "needs-human",
+      distilled_intent: normalizeGoal(request.task.goal),
+      reasoning_summary: buildReasoningSummary(
+        request,
+        counts,
+        verification,
+        "low_trust_or_consensus_deadlock",
+      ),
+      candidate_actions: [buildNeedsHumanAction(verification)],
+      memory_exports: [],
+      safety: {
+        requires_human_approval: true,
+        forbidden_action_attempted: false,
+      },
+      verification,
+    });
+  }
+
+  return katalaThinkResponseSchema.parse({
     request_id: request.request_id,
-    status: reasonCodes.length > 0 ? "unsafe" : "ok",
+    status: "ok",
     distilled_intent: normalizeGoal(request.task.goal),
-    reasoning_summary: buildReasoningSummary(
-      request,
-      counts,
-      reasonCodes.length > 0 ? reasonCodes.join(",") : undefined,
-    ),
-    candidate_actions: reasonCodes.length > 0
-      ? [buildUnsafeAction(reasonCodes)]
-      : [buildOkAction(request, counts)],
+    reasoning_summary: buildReasoningSummary(request, counts, verification),
+    candidate_actions: [buildOkAction(request, counts, trustEvaluation)],
     memory_exports: [],
     safety: {
-      requires_human_approval: reasonCodes.length > 0,
-      forbidden_action_attempted: reasonCodes.length > 0,
+      requires_human_approval: false,
+      forbidden_action_attempted: false,
     },
-  };
-
-  return katalaThinkResponseSchema.parse(response);
+    verification,
+  });
 }
 
 export function createKatalaThinkRejection(rawRequestId, reasonCodes) {
@@ -230,6 +356,7 @@ export function createKatalaThinkRejection(rawRequestId, reasonCodes) {
       requires_human_approval: true,
       forbidden_action_attempted: true,
     },
+    verification: emptyVerification("request_rejected_before_trust_scoring"),
   };
 
   return katalaThinkResponseSchema.parse(response);
@@ -245,7 +372,10 @@ export function createKatalaThinkResponseFromUnknown(input) {
     const reasonCodes = parsed.error.issues.map((issue) =>
       `invalid_${issue.path.join("_") || "request"}`,
     );
-    return createKatalaThinkRejection(rawRequestId, reasonCodes.length > 0 ? reasonCodes : ["invalid_request"]);
+    return createKatalaThinkRejection(
+      rawRequestId,
+      reasonCodes.length > 0 ? reasonCodes : ["invalid_request"],
+    );
   }
 
   return createKatalaThinkResponse(parsed.data);

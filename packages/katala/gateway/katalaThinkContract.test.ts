@@ -125,8 +125,59 @@ describe("createKatalaThinkResponse", () => {
     expect(response.memory_exports).toEqual([]);
     expect(response.safety.requires_human_approval).toBe(false);
     expect(response.candidate_actions[0]?.payload?.recommended_action).toBe("stateless-review");
+    expect(response.verification.enabled).toBe(true);
+    expect(response.verification.claim_count).toBe(1);
+    expect(response.verification.grade).not.toBe("N/A");
+    expect(response.verification.axes).not.toBeNull();
   });
 
+  it("scores generated provenance lower and may require human approval", () => {
+    const request = katalaThinkRequestSchema.parse({
+      ...baseRequest,
+      context_items: [
+        {
+          id: "ctx-generated-1",
+          kind: "model-output",
+          content: "Unverified model claim about market direction.",
+          visibility: "PUBLIC",
+          provenance: "generated-llm-summary",
+          ttl_seconds: 3600,
+        },
+      ],
+    });
+
+    const response = createKatalaThinkResponse(request);
+    expect(response.verification.enabled).toBe(true);
+    expect(response.verification.claim_count).toBe(1);
+    expect(["C", "D", "F"]).toContain(response.verification.grade);
+    expect(response.verification.caveats.join(",")).toMatch(/generated|local_dual/);
+  });
+
+  it("never includes PRIVATE context content in verification payloads", () => {
+    const privateSecret = "PRIVATE-SECRET-DO-NOT-LEAK";
+    const request = katalaThinkRequestSchema.parse({
+      ...baseRequest,
+      context_items: [
+        ...baseRequest.context_items,
+        {
+          id: "ctx-private-1",
+          kind: "note",
+          content: privateSecret,
+          visibility: "PRIVATE",
+          provenance: "user/private-note",
+          ttl_seconds: 3600,
+        },
+      ],
+    });
+
+    const response = createKatalaThinkResponse(request);
+    const serialized = JSON.stringify(response);
+
+    expect(serialized).not.toContain(privateSecret);
+    expect(response.verification.claim_summaries.every((item) => item.id !== "ctx-private-1")).toBe(
+      true,
+    );
+  });
   it("marks requests with write paths as unsafe to preserve read-only execution", () => {
     const request = katalaThinkRequestSchema.parse({
       ...baseRequest,
