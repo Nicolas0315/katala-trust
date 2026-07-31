@@ -19,6 +19,7 @@ Use this skill when the host is about to take a **side effect** or when the user
    - `ask-human` → stop for operator approval
 
 Never let Katala write host memory or run shell itself. Sidecar stays read-only.
+Call `sanitizeThinkRequest` from `packages/katala/gateway/contextSanitizer.mjs` so PRIVATE/IGNORE items never leave the host.
 
 ## Minimal invoke
 
