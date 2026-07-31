@@ -16,7 +16,8 @@ describe("contextSanitizer", () => {
     expect(dropped_private).toBe(1);
     expect(dropped_ignore).toBe(1);
     expect(request.memory_mode).toBe("none");
-    expect(request.context_items).toHaveLength(2);
-    expect(request.context_items.map((i) => i.id)).toEqual(["1", "4"]);
+    const items = request.context_items as Array<{ id: string }>;
+    expect(items).toHaveLength(2);
+    expect(items.map((i) => i.id)).toEqual(["1", "4"]);
   });
 });
