@@ -11,13 +11,17 @@ const adapterUrl = pathToFileURL(
   path.join(root, "packages", "katala", "gateway", "openClawToolAdapter.mjs"),
 ).href;
 const { toolArgsToThinkRequest, OPENCLAW_KATALA_THINK_TOOL } = await import(adapterUrl);
+const sanitizerUrl = pathToFileURL(
+  path.join(root, "packages", "katala", "gateway", "contextSanitizer.mjs"),
+).href;
+const { sanitizeThinkRequest } = await import(sanitizerUrl);
 
 if (OPENCLAW_KATALA_THINK_TOOL.name !== "katala_think") {
   console.error("tool descriptor name mismatch");
   process.exit(1);
 }
 
-const request = toolArgsToThinkRequest(
+const rawRequest = toolArgsToThinkRequest(
   {
     goal: "Decide whether to execute a write",
     mode: "review",
@@ -28,6 +32,13 @@ const request = toolArgsToThinkRequest(
         content: "Sidecar must stay read-only by default.",
         visibility: "PUBLIC",
         provenance: "primary-docs",
+      },
+      {
+        id: "priv-1",
+        kind: "note",
+        content: "Host-only private note must not reach sidecar.",
+        visibility: "PRIVATE",
+        provenance: "host-memory",
       },
       {
         id: "gen-1",
@@ -41,6 +52,12 @@ const request = toolArgsToThinkRequest(
   },
   { hostName: "openclaw-smoke", sessionId: "adapter-smoke", requestId: "adapter-smoke-1" },
 );
+
+const { request, dropped_private } = sanitizeThinkRequest(rawRequest);
+if (dropped_private < 1) {
+  console.error("expected PRIVATE context to be dropped", { dropped_private, request });
+  process.exit(1);
+}
 
 const cli = path.join(root, "packages", "katala", "gateway", "katala-think.mjs");
 const result = spawnSync(process.execPath, [cli], {
@@ -74,6 +91,7 @@ console.log(
   JSON.stringify(
     {
       tool: OPENCLAW_KATALA_THINK_TOOL.name,
+      dropped_private,
       status: response.status,
       grade: response.verification.grade,
       consensus: response.verification.consensus,
