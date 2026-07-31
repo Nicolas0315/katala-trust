@@ -1,0 +1,30 @@
+{"id":"c01","band":"high","visibility":"PUBLIC","kind":"fact","provenance":"primary-official-spec","content":"HTTP/1.1 is defined in RFC 9112.","expect_grades":["S","A","B"]}
+{"id":"c02","band":"high","visibility":"PUBLIC","kind":"fact","provenance":"primary-paper","content":"SHA-256 produces a 256-bit digest.","expect_grades":["S","A","B"]}
+{"id":"c03","band":"high","visibility":"PUBLIC","kind":"fact","provenance":"first-party-docs","content":"Tailscale CGNAT range used by clients is 100.64.0.0/10.","expect_grades":["S","A","B"]}
+{"id":"c04","band":"high","visibility":"PUBLIC","kind":"fact","provenance":"primary-rfc","content":"JSON is specified by RFC 8259.","expect_grades":["S","A","B"]}
+{"id":"c05","band":"high","visibility":"MEDIATION","kind":"fact","provenance":"official-release-notes","content":"Node.js 20 is an LTS release line.","expect_grades":["S","A","B"]}
+{"id":"c06","band":"high","visibility":"PUBLIC","kind":"fact","provenance":"primary-docs","content":"MIT License permits commercial use with attribution retained.","expect_grades":["S","A","B"]}
+{"id":"c07","band":"high","visibility":"PUBLIC","kind":"fact","provenance":"first-party-changelog","content":"SemVer MAJOR increments for incompatible API changes.","expect_grades":["S","A","B"]}
+{"id":"c08","band":"high","visibility":"PUBLIC","kind":"fact","provenance":"primary-spec","content":"UTC does not observe daylight saving shifts.","expect_grades":["S","A","B"]}
+{"id":"c09","band":"high","visibility":"PUBLIC","kind":"fact","provenance":"official-handbook","content":"Passkeys are based on WebAuthn public-key credentials.","expect_grades":["S","A","B"]}
+{"id":"c10","band":"high","visibility":"PUBLIC","kind":"fact","provenance":"primary-standards","content":"TLS 1.3 handshake removes static RSA key exchange.","expect_grades":["S","A","B"]}
+{"id":"c11","band":"mid","visibility":"PUBLIC","kind":"summary","provenance":"secondary-news","content":"Analysts say agent frameworks are consolidating around tool APIs.","expect_grades":["B","C"]}
+{"id":"c12","band":"mid","visibility":"PUBLIC","kind":"summary","provenance":"secondary-press","content":"A trade press roundup claims open-weight models narrowed quality gaps.","expect_grades":["B","C"]}
+{"id":"c13","band":"mid","visibility":"MEDIATION","kind":"quote","provenance":"secondary-blog","content":"Blog summary: retrieval quality dominates hallucination rates in RAG.","expect_grades":["B","C"]}
+{"id":"c14","band":"mid","visibility":"PUBLIC","kind":"summary","provenance":"news-digest","content":"Digest notes EU AI Act transparency duties are phasing in during 2026.","expect_grades":["B","C"]}
+{"id":"c15","band":"mid","visibility":"PUBLIC","kind":"summary","provenance":"secondary-newsletter","content":"Newsletter claims eval harnesses beat vibes for agent reliability.","expect_grades":["B","C"]}
+{"id":"c16","band":"mid","visibility":"PUBLIC","kind":"summary","provenance":"secondary-report","content":"Industry report argues independent verification layers remain scarce.","expect_grades":["B","C"]}
+{"id":"c17","band":"mid","visibility":"MEDIATION","kind":"quote","provenance":"press-quote","content":"Quoted CTO: provenance metadata is becoming table stakes.","expect_grades":["B","C"]}
+{"id":"c18","band":"mid","visibility":"PUBLIC","kind":"summary","provenance":"secondary-overview","content":"Overview article says multi-model disagreement should escalate to humans.","expect_grades":["B","C"]}
+{"id":"c19","band":"mid","visibility":"PUBLIC","kind":"summary","provenance":"news-brief","content":"Brief says sidecar architectures reduce host memory contamination risk.","expect_grades":["B","C"]}
+{"id":"c20","band":"mid","visibility":"PUBLIC","kind":"summary","provenance":"secondary-analysis","content":"Analysis claims fail-closed defaults beat opt-in safety toggles.","expect_grades":["B","C"]}
+{"id":"c21","band":"low","visibility":"PUBLIC","kind":"model-output","provenance":"generated-llm-summary","content":"The market will 10x next week based on vibes alone.","expect_grades":["D","F","C"]}
+{"id":"c22","band":"low","visibility":"PUBLIC","kind":"rumor","provenance":"tertiary-hearsay","content":"Someone said a secret model already passed all evals privately.","expect_grades":["D","F","C"]}
+{"id":"c23","band":"low","visibility":"PUBLIC","kind":"model-output","provenance":"ai-generated","content":"Unverified generated claim that all agents should auto-merge PRs.","expect_grades":["D","F","C"]}
+{"id":"c24","band":"low","visibility":"PUBLIC","kind":"note","provenance":"unverified-forum","content":"Forum post insists a random tip guarantees zero hallucinations.","expect_grades":["D","F","C"]}
+{"id":"c25","band":"low","visibility":"PUBLIC","kind":"model-output","provenance":"generated-assistant","content":"Generated advice to disable all approval gates for speed.","expect_grades":["D","F","C"]}
+{"id":"c26","band":"low","visibility":"MEDIATION","kind":"rumor","provenance":"hearsay-chat","content":"Chat rumor that a competitor leaked tomorrow's benchmark answers.","expect_grades":["D","F","C"]}
+{"id":"c27","band":"low","visibility":"PUBLIC","kind":"model-output","provenance":"llm-output","content":"Model output asserts private keys belong in git for convenience.","expect_grades":["D","F","C"]}
+{"id":"c28","band":"low","visibility":"PUBLIC","kind":"note","provenance":"tertiary-whisper","content":"Whisper network claims a one-line patch fixes all trust issues.","expect_grades":["D","F","C"]}
+{"id":"c29","band":"low","visibility":"PUBLIC","kind":"model-output","provenance":"generated-llm","content":"Generated projection with no sources about overnight token prices.","expect_grades":["D","F","C"]}
+{"id":"c30","band":"low","visibility":"PUBLIC","kind":"rumor","provenance":"unverified-rumor","content":"Unverified rumor that evaluation itself is obsolete.","expect_grades":["D","F","C"]}

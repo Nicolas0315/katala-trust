@@ -14,7 +14,7 @@ Make the public claim true: **`katala:think` is a verification sidecar**, not on
 | 2 | Public CI on `katala-trust` | GitHub Actions runs `npm run verify:local` on PR/push | **done 2026-08-01** |
 | 3 | Host embed sample | `examples/host-hook-smoke` calls think and asserts fail-closed + trust fields | **done 2026-08-01** |
 | 4 | Narrow OSS core further | Export drops Economic/XAlgorithm/Profiling/IdentityAdoption from public cut | **done 2026-08-01** |
-| 5 | Tiny labeled eval set | 20–50 claims → grade distribution reproducible in CI | pending |
+| 5 | Tiny labeled eval set | 20–50 claims → grade distribution reproducible in CI | **done 2026-08-01** (`evals/trust-claims-v1.jsonl`, 30/30 @ 0.8 threshold) |
 
 ## Non-goals (parked)
 
@@ -35,5 +35,6 @@ cd ../katala-trust && npm run verify:local
 
 ## Status
 
-- 2026-08-01: Rank 1–4 landed (`thinkTrustBridge.mjs`, host-hook smoke, OSS CI workflow, narrower export).
-- Next: Rank 5 labeled eval set + real OpenClaw/host wiring beyond smoke.
+- 2026-08-01: Rank 1–5 landed (`thinkTrustBridge.mjs`, host-hook smoke, OSS CI, narrower export, `evals/trust-claims-v1.jsonl`).
+- Overnight loop until 09:00 JST continues verify/harden/research notes.
+- Next after sleep: real OpenClaw host wiring beyond smoke.
