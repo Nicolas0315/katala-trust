@@ -15,10 +15,21 @@ printf '%s' '{"request_id":"smoke","host":{"name":"local","session_id":"manual"}
   | npm run katala:think --silent
 ```
 
+## Host embed chain
+
+1. `sanitizeThinkRequest` — drop PRIVATE/IGNORE (`contextSanitizer.mjs`)
+2. `toolArgsToThinkRequest` — map host tool args (`openClawToolAdapter.mjs`)
+3. `katala:think` — verification block on stdout
+4. `decideHostAction` — allow / block / ask-human (`hostApprovalGate.mjs`)
+5. Optional skill: `skills/katala-think/SKILL.md`
+
+Eval non-regression: `evals/trust-claims-v1.jsonl` via `npm run verify:trust-eval`.
+
 ## Docs
 
 - [Industry landscape (2026-07)](docs/industry/INDUSTRY_LANDSCAPE_2026-07.md)
 - [Parts assembly](docs/industry/PARTS_ASSEMBLY.md)
+- [Host embed notes](docs/industry/HOST_EMBED_NOTES_2026-08-01.md)
 - [Thought engine contract](docs/openclaw/KATALA_THOUGHT_ENGINE_CONTRACT.md)
 - [Safe embedding](docs/openclaw/OPENCLAW_SAFE_EMBEDDING.md)
 
