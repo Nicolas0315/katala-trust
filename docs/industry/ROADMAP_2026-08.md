@@ -37,5 +37,5 @@ cd ../katala-trust && npm run verify:local
 
 - 2026-08-01: Rank 1–5 landed (`thinkTrustBridge.mjs`, host-hook smoke, OSS CI, narrower export, `evals/trust-claims-v1.jsonl`).
 - 2026-08-01: OpenClaw tool adapter (`openClawToolAdapter.mjs` + smoke) maps host tool args → `katala:think`.
-- Overnight loop until 09:00 JST continues verify/harden/research notes.
-- Next after sleep: register adapter against a real OpenClaw/ZeroClaw runtime (not smoke-only).
+- 2026-08-01 overnight: host embed chain solidified — sanitizer → tool adapter → think → approval gate → skill package; Rank-5 eval in CI; public tip tracks `katala-trust`.
+- Operator after 09:00: junction `skills/katala-think` into `~/.openclaw/skills` and capture one live blocked-write.
