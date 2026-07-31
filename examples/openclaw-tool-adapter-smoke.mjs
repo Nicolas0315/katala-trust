@@ -60,6 +60,16 @@ if (!response.verification?.enabled) {
   process.exit(1);
 }
 
+const gateUrl = pathToFileURL(
+  path.join(root, "packages", "katala", "gateway", "hostApprovalGate.mjs"),
+).href;
+const { decideHostAction } = await import(gateUrl);
+const decision = decideHostAction(response);
+if (!decision.decision || !["allow", "block", "ask-human"].includes(decision.decision)) {
+  console.error("invalid host decision", decision);
+  process.exit(1);
+}
+
 console.log(
   JSON.stringify(
     {
@@ -68,6 +78,8 @@ console.log(
       grade: response.verification.grade,
       consensus: response.verification.consensus,
       requires_human_approval: response.safety?.requires_human_approval === true,
+      host_decision: decision.decision,
+      host_reasons: decision.reasons,
     },
     null,
     2,
