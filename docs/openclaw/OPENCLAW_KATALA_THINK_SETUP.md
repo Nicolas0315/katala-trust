@@ -16,4 +16,14 @@ printf '%s' '{"request_id":"smoke","host":{"name":"local","session_id":"manual"}
   | npm run katala:think --silent
 ```
 
+## Host tool adapter
+
+OpenClaw-compatible hosts can register `OPENCLAW_KATALA_THINK_TOOL` from
+`packages/katala/gateway/openClawToolAdapter.mjs` and map tool args with
+`toolArgsToThinkRequest` before piping JSON to `katala:think`.
+
+```bash
+node examples/openclaw-tool-adapter-smoke.mjs
+```
+
 See also [OPENCLAW_SAFE_EMBEDDING.md](./OPENCLAW_SAFE_EMBEDDING.md).
