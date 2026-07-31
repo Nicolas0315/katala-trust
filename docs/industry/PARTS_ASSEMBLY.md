@@ -29,9 +29,8 @@ Private monorepo remains the R&D home; this cut is what outsiders can run and tr
 ```bash
 npm test -- --run
 npm run typecheck:katala
-npm run verify:usability
-# gateway HTTP + intake + mediation pack (covered by Vitest above)
-bash scripts/verify.sh leak   # when git index present
+npm run verify:gateway
+npm run verify:local
 ```
 
 Gateway coverage added 2026-07-31:

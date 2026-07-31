@@ -84,7 +84,10 @@ export class KatalaClawGateway {
       parseGatewayTokens(
         process.env.KATALA_GATEWAY_PEER_TOKENS ?? process.env.KATALA_GATEWAY_PEER_TOKEN,
       );
-    const requireToken = this.requireToken ?? acceptedTokens.length > 0;
+    // Fail-closed: require a peer token unless explicitly disabled.
+    const requireToken =
+      this.requireToken ??
+      (process.env.KATALA_GATEWAY_ALLOW_TAILNET_ONLY === "1" ? acceptedTokens.length > 0 : true);
 
     return verifyPeerRequest(
       { remoteAddress: clientIp, headers },
@@ -140,13 +143,20 @@ export class KatalaClawGateway {
     res.end();
   }
 
-  private readBody(req: http.IncomingMessage): Promise<string> {
+  private readBody(req: http.IncomingMessage, maxBytes = 1_048_576): Promise<string> {
     return new Promise((resolve, reject) => {
-      let body = "";
-      req.on("data", (chunk) => {
-        body += chunk;
+      const chunks: Buffer[] = [];
+      let total = 0;
+      req.on("data", (chunk: Buffer) => {
+        total += chunk.length;
+        if (total > maxBytes) {
+          reject(new Error(`request body exceeds ${maxBytes} bytes`));
+          req.destroy();
+          return;
+        }
+        chunks.push(chunk);
       });
-      req.on("end", () => resolve(body));
+      req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
       req.on("error", reject);
     });
   }
@@ -167,7 +177,13 @@ export class KatalaClawGateway {
       res.end(JSON.stringify(result));
     } catch (error) {
       console.error(`[Gateway] Mediation Error:`, error);
-      res.writeHead(error instanceof SyntaxError ? 400 : 422, {
+      const status =
+        error instanceof SyntaxError
+          ? 400
+          : error instanceof Error && /exceeds .* bytes/.test(error.message)
+            ? 413
+            : 422;
+      res.writeHead(status, {
         "Content-Type": "application/json",
       });
       res.end(

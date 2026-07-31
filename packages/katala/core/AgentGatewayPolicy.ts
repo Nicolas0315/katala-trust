@@ -29,10 +29,24 @@ export interface HumanApprovalMediationRequest {
   request: SynergyRequest;
 }
 
-const DEFAULT_TAILSCALE_PREFIXES = ["100.", "::ffff:100.", "fd7a:115c:a1e0:"];
+/** When omitted, Tailscale CGNAT 100.64.0.0/10 and fd7a:115c:a1e0::/48 are used. */
 
 function normalizeRemoteAddress(address: string): string {
   return address.trim().replace(/^\[|\]$/g, "");
+}
+
+function isTailscaleCgnatV4(address: string): boolean {
+  const match = address.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (!match) return false;
+  const octets = match.slice(1).map(Number);
+  if (octets.some((part) => part > 255)) return false;
+  // Tailscale userspace CGNAT: 100.64.0.0/10
+  return octets[0] === 100 && octets[1] >= 64 && octets[1] <= 127;
+}
+
+function isTailscaleV6(address: string): boolean {
+  const normalized = address.toLowerCase();
+  return normalized === "fd7a:115c:a1e0::" || normalized.startsWith("fd7a:115c:a1e0:");
 }
 
 function constantTimeEquals(left: string, right: string): boolean {
@@ -56,15 +70,22 @@ export function extractBearerToken(
 
 export function isTrustedTailnetAddress(
   remoteAddress: string,
-  prefixes: string[] = DEFAULT_TAILSCALE_PREFIXES,
+  prefixes?: string[],
 ): boolean {
   const normalized = normalizeRemoteAddress(remoteAddress);
-  return prefixes.some((prefix) => normalized.startsWith(prefix));
+  const withoutMapped = normalized.replace(/^::ffff:/i, "");
+
+  if (prefixes && prefixes.length > 0) {
+    return prefixes.some(
+      (prefix) => normalized.startsWith(prefix) || withoutMapped.startsWith(prefix),
+    );
+  }
+
+  return isTailscaleCgnatV4(withoutMapped) || isTailscaleV6(normalized);
 }
 
 export function verifyPeerRequest(input: PeerAuthInput, config: PeerAuthConfig): PeerAuthResult {
-  const prefixes = config.trustedTailscalePrefixes ?? DEFAULT_TAILSCALE_PREFIXES;
-  if (!isTrustedTailnetAddress(input.remoteAddress, prefixes)) {
+  if (!isTrustedTailnetAddress(input.remoteAddress, config.trustedTailscalePrefixes)) {
     return { ok: false, reason: "remote-address-outside-tailnet" };
   }
 

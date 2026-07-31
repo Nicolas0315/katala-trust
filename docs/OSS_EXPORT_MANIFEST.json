@@ -1,29 +1,22 @@
 {
   "source_repo": "Nicolas0315/Katala (private monorepo)",
   "public_package": "katala-trust",
-  "file_count": 97,
-  "personal_marker_hits": 12,
+  "file_count": 81,
+  "personal_marker_hits": 0,
   "includes": [
     "LICENSE",
-    "CONTRIBUTING.md",
-    "CONTRIBUTORS.md",
     "MANIFESTO.md",
-    ".env.example",
-    ".gitignore",
+    "CONTRIBUTORS.md",
     ".npmrc",
     ".nvmrc",
     ".python-version",
     "eslint.config.mjs",
     "packages/katala",
-    "docs/philosophy",
-    "docs/security",
     "docs/industry",
     "docs/architecture/SYSTEM_OVERVIEW.md",
     "docs/openclaw/KATALA_THOUGHT_ENGINE_CONTRACT.md",
     "docs/openclaw/OPENCLAW_SAFE_EMBEDDING.md",
-    "docs/openclaw/OPENCLAW_KATALA_THINK_SETUP.md",
-    "docs/openclaw/README.md",
-    "scripts/ci/verify-leak-guard.sh"
+    "docs/openclaw/OPENCLAW_KATALA_THINK_SETUP.md"
   ],
-  "exported_at": "2026-07-31T13:57:15Z"
+  "exported_at": "2026-07-31T14:05:21Z"
 }

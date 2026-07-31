@@ -93,7 +93,8 @@ export const katalaThinkResponseSchema = z.object({
 });
 
 function normalizeGoal(goal) {
-  return goal.replace(/\s+/g, " ").trim().slice(0, 240);
+  const normalized = goal.replace(/\s+/g, " ").trim().slice(0, 240);
+  return normalized.length > 0 ? normalized : "unspecified-goal";
 }
 
 function summarizeContext(contextItems) {

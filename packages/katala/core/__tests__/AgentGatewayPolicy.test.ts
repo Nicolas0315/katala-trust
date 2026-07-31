@@ -3,6 +3,7 @@ import { createDefaultVector } from "../IdentityVector";
 import {
   createHumanApprovalMediationRequest,
   extractBearerToken,
+  isTrustedTailnetAddress,
   parseGatewayTokens,
   validateMediationEnvelope,
   verifyPeerRequest,
@@ -14,17 +15,26 @@ describe("AgentGatewayPolicy", () => {
     expect(parseGatewayTokens("a, b ,,c")).toEqual(["a", "b", "c"]);
   });
 
+  it("accepts Tailscale CGNAT range and rejects adjacent public 100/8", () => {
+    expect(isTrustedTailnetAddress("100.64.0.1")).toBe(true);
+    expect(isTrustedTailnetAddress("100.127.255.255")).toBe(true);
+    expect(isTrustedTailnetAddress("100.63.255.255")).toBe(false);
+    expect(isTrustedTailnetAddress("100.128.0.1")).toBe(false);
+    expect(isTrustedTailnetAddress("203.0.113.10")).toBe(false);
+    expect(isTrustedTailnetAddress("fd7a:115c:a1e0::1")).toBe(true);
+  });
+
   it("requires trusted tailnet address and peer token when configured", () => {
     const config = { acceptedTokens: ["secret"], requireToken: true };
 
     expect(
       verifyPeerRequest(
-        { remoteAddress: "100.75.193.86", headers: { authorization: "Bearer secret" } },
+        { remoteAddress: "100.64.0.1", headers: { authorization: "Bearer secret" } },
         config,
       ).ok,
     ).toBe(true);
     expect(
-      verifyPeerRequest({ remoteAddress: "100.75.193.86", headers: {} }, config).reason,
+      verifyPeerRequest({ remoteAddress: "100.64.0.1", headers: {} }, config).reason,
     ).toBe("missing-peer-token");
     expect(
       verifyPeerRequest(

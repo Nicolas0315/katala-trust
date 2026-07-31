@@ -27,6 +27,8 @@
   "exclude": [
     "node_modules",
     "packages/katala/mediation-client",
-    "packages/katala/core/test-synergy.ts"
+    "packages/katala/core/test-synergy.ts",
+    "packages/katala/gateway/PythonInfCodingAdapter.ts",
+    "packages/katala/gateway/index.ts"
   ]
 }

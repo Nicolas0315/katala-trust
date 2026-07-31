@@ -16,9 +16,10 @@ describe("LocalMediationManager", () => {
     expect(typeof result.synergy.score).toBe("number");
   });
 
-  it("accepts Tailscale-range addresses and rejects public IPs", async () => {
-    expect(await manager.verifyIdentity("100.75.193.86")).toBe(true);
+  it("accepts Tailscale CGNAT addresses and rejects public IPs", async () => {
+    expect(await manager.verifyIdentity("100.64.0.1")).toBe(true);
     expect(await manager.verifyIdentity("fd7a:115c:a1e0::1")).toBe(true);
+    expect(await manager.verifyIdentity("100.63.255.255")).toBe(false);
     expect(await manager.verifyIdentity("203.0.113.10")).toBe(false);
     expect(await manager.verifyIdentity("127.0.0.1")).toBe(false);
   });
