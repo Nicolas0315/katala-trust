@@ -26,5 +26,7 @@ jobs:
         run: node examples/host-decision-matrix.mjs
       - name: Blocked write demo
         run: node examples/blocked-write-demo.mjs
+      - name: Think-host CLI smoke
+        run: node examples/think-host-cli-smoke.mjs
       - name: Trust eval v1
         run: node scripts/run-trust-eval.mjs
