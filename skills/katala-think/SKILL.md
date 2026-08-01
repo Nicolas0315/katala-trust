@@ -27,6 +27,13 @@ Call `sanitizeThinkRequest` from `packages/katala/gateway/contextSanitizer.mjs` 
 node examples/openclaw-tool-adapter-smoke.mjs
 node examples/host-hook-smoke.mjs
 node examples/blocked-write-demo.mjs
+node examples/think-host-cli-smoke.mjs
+```
+
+Host exec wrapper (stdin tool args → decision; exit 0/2/3):
+
+```bash
+npm run katala:think-host
 ```
 
 On a Windows host, junction example:
