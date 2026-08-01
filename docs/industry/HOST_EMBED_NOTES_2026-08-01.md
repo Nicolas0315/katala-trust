@@ -15,10 +15,12 @@ Retrieved / updated: 2026-08-01 morning
 2. Blocked-write demo: intended production write → `host_decision=block`, `write_performed=false`
 3. Junction/symlink installs that resolve outside the skills root fail with `symlink-escape`
 4. Host CLI exit codes are enforceable by callers (`0/2/3`)
+5. Deterministic `examples/agent-turn-preflight.mjs` in CI
+6. Live OpenClaw local agent turn ran the preflight via `exec` and returned `host_decision=block` / `write_performed=false`
 
 ## Still open
 
-1. A live gateway/agent turn that calls `katala:think-host` before a write
+1. Gateway-routed agent turn (non-`--local`) with provider auth on the gateway host
 2. Rate limits / timeouts for production sessions
 3. Expanding eval only when scoring rules change
 
