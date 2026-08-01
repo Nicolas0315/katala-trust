@@ -1,6 +1,6 @@
-# Host embedding notes — 2026-08-01 overnight
+# Host embedding notes — 2026-08-01
 
-Retrieved / written: 2026-08-01 (overnight loop)
+Retrieved / updated: 2026-08-01 morning
 
 ## Current embed surface
 
@@ -8,25 +8,22 @@ Retrieved / written: 2026-08-01 (overnight loop)
 - Verification block: axes / grade / consensus / dissent / claim_summaries
 - Host tool mapper: `openClawToolAdapter.mjs` (`katala_think` descriptor + `toolArgsToThinkRequest`)
 - Host decision helper: `hostApprovalGate.mjs` (`decideHostAction` → allow / block / ask-human)
-- Smokes: `host-hook-smoke.mjs`, `openclaw-tool-adapter-smoke.mjs`
+- Context sanitizer: `contextSanitizer.mjs` (drops PRIVATE/IGNORE)
+- Smokes: `host-hook-smoke.mjs`, `openclaw-tool-adapter-smoke.mjs`, `host-decision-matrix.mjs`, `blocked-write-demo.mjs`
 - Eval: `evals/trust-claims-v1.jsonl` (30 labeled; runner threshold 0.8)
+- Skill: `skills/katala-think/SKILL.md` (junctioned into local OpenClaw skills on 2026-08-01)
 
-## What is still not “real host”
+## Proven this morning
 
-Smoke proves the adapter shape. It does **not** prove:
+1. Junction: `~/.openclaw/skills/katala-think` → `katala-trust/skills/katala-think`
+2. Blocked-write demo: intended production write → `host_decision=block`, `write_performed=false`
+3. PRIVATE context dropped before sidecar (`dropped_private=1`)
 
-1. A live OpenClaw/ZeroClaw process registering the tool
-2. Host approval gate wiring `needs-human` → block execution
-3. Context sanitizer stripping PRIVATE before export
-4. Production session IDs / rate limits / timeouts
+## Still open
 
-Next operator step after 09:00: point one real host config at `OPENCLAW_KATALA_THINK_TOOL` and log one blocked write.
-
-## Local OpenClaw observation (2026-08-01)
-
-- `~/.openclaw/openclaw.json` present; `tools.exec.mode=full` (no Katala tool registered yet).
-- Skills dir populated with many skills; **no `katala-think` skill** until operator links `skills/katala-think`.
-- Real registration still needs an explicit local symlink/junction — overnight loop does **not** mutate `~/.openclaw` config without operator intent.
+1. Live OpenClaw process registering `OPENCLAW_KATALA_THINK_TOOL` as a native tool (beyond skill text)
+2. Production session IDs / rate limits / timeouts
+3. Expanding eval only when scoring rules change
 
 ## Measurement posture
 

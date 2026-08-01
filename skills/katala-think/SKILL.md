@@ -26,6 +26,13 @@ Call `sanitizeThinkRequest` from `packages/katala/gateway/contextSanitizer.mjs` 
 ```bash
 node examples/openclaw-tool-adapter-smoke.mjs
 node examples/host-hook-smoke.mjs
+node examples/blocked-write-demo.mjs
+```
+
+On a Windows host, junction example:
+
+```bat
+mklink /J "%USERPROFILE%\.openclaw\skills\katala-think" "%CD%\skills\katala-think"
 ```
 
 ## Install into local OpenClaw skills (operator)

@@ -24,5 +24,7 @@ jobs:
         run: node examples/openclaw-tool-adapter-smoke.mjs
       - name: Host decision matrix
         run: node examples/host-decision-matrix.mjs
+      - name: Blocked write demo
+        run: node examples/blocked-write-demo.mjs
       - name: Trust eval v1
         run: node scripts/run-trust-eval.mjs
